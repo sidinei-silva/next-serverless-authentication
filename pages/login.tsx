@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { FormEvent } from 'react';
 
 // import { Container } from './styles';
@@ -8,7 +9,17 @@ const Login: React.FC = () => {
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    alert(`email: ${email}`);
+
+    axios
+      .post('/api/login', { email, password })
+      .then(response => {
+        alert(
+          `Email: ${response.data.email}\rSenha: ${response.data.password}`
+        );
+      })
+      .catch(err => {
+        alert(err.message);
+      });
   };
 
   return (
