@@ -63,6 +63,14 @@ export default async (
 
   const collection = db.collection('users');
 
+  const checkEmailExist = await collection.findOne({ email });
+
+  if (checkEmailExist) {
+    res.statusCode = 401;
+    res.json({ status: 'error', message: 'Email exists' });
+    return;
+  }
+
   await collection.insertOne({
     name,
     email,
