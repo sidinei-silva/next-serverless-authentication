@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { MongoClient, Db } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import url from 'url';
@@ -71,10 +72,12 @@ export default async (
     return;
   }
 
+  const hashPassword = await bcrypt.hash(password, 8);
+
   await collection.insertOne({
     name,
     email,
-    password
+    password: hashPassword
   });
 
   res.statusCode = 200;
