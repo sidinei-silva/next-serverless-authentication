@@ -3,6 +3,7 @@ import Head from 'next/head';
 import React, { useEffect } from 'react';
 
 import styles from '../styles/Home.module.css';
+import withAuth from '../utils/withAuth';
 
 const Home: React.FC = () => {
   const [users, setUsers] = React.useState([]);
@@ -66,4 +67,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default withAuth(Home);
