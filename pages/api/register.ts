@@ -23,7 +23,10 @@ async function connectToDatabase(uri: string) {
   return db;
 }
 
-export default (req: NextApiRequest, res: NextApiResponse): void => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> => {
   const { name, email, password } = req.body;
 
   if (req.method !== 'POST') {
@@ -56,6 +59,16 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
     return;
   }
 
+  const db = await connectToDatabase(process.env.MONGODB_URI);
+
+  const collection = db.collection('users');
+
+  await collection.insertOne({
+    name,
+    email,
+    password
+  });
+
   res.statusCode = 200;
-  res.json({ name, email, password });
+  res.json({ status: 'success', data: { name, email, password } });
 };
