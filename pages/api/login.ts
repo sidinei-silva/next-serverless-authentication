@@ -1,7 +1,10 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { MongoClient, Db } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import url from 'url';
+
+import authConfig from '../../config/auth';
 
 let cachedDb: Db = null;
 
@@ -74,6 +77,13 @@ export default async (
     return;
   }
 
+  const token = jwt.sign({ _id: checkExist._id, email }, authConfig.secret, {
+    expiresIn: authConfig.expiresIn
+  });
+
   res.statusCode = 200;
-  res.json({ email, password });
+  res.json({
+    status: 'success',
+    data: { name: checkExist.name, email, token }
+  });
 };
