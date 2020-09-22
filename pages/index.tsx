@@ -1,9 +1,23 @@
+import Axios from 'axios';
 import Head from 'next/head';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import styles from '../styles/Home.module.css';
 
 const Home: React.FC = () => {
+  const [users, setUsers] = React.useState([]);
+  const [errorMessage, setErrorMessage] = React.useState('');
+
+  const getUsers = async () => {
+    await Axios.get('/api/users')
+      .then(response => setUsers(response.data.data))
+      .catch(err => setErrorMessage(err.message));
+  };
+
+  useEffect(() => {
+    getUsers();
+  });
+
   return (
     <div className={styles.container}>
       <Head>
@@ -12,56 +26,42 @@ const Home: React.FC = () => {
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        <h1 className={styles.title}>Welcome</h1>
+        <p className={styles.description}>Users list</p>
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
+        {errorMessage && (
+          <p
+            style={{
+              padding: '10px',
+              backgroundColor: '#e74c3c',
+              color: '#fff'
+            }}
           >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
+            {errorMessage}
+          </p>
+        )}
 
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <table style={{ border: '1px solid #ccc', width: '600px' }}>
+          <tr style={{ backgroundColor: '#ecf0f1' }}>
+            <th
+              style={{
+                fontWeight: 'bold',
+                padding: '10px 20px'
+              }}
+            >
+              Name
+            </th>
+            <th style={{ fontWeight: 'bold', padding: '10px 20px' }}>Email</th>
+          </tr>
+          {users &&
+            users.map(user => (
+              <tr>
+                <td>{user.name}</td>
+                <td>{user.email}</td>
+              </tr>
+            ))}
+        </table>
       </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
     </div>
   );
 };
