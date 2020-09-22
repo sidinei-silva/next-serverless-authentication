@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import { MongoClient, Db } from 'mongodb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import url from 'url';
@@ -23,7 +24,10 @@ async function connectToDatabase(uri: string) {
   return db;
 }
 
-export default (req: NextApiRequest, res: NextApiResponse): void => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> => {
   const { email, password } = req.body;
 
   if (req.method !== 'POST') {
@@ -47,6 +51,26 @@ export default (req: NextApiRequest, res: NextApiResponse): void => {
   if (!password) {
     res.statusCode = 400;
     res.json({ status: 'error', message: 'Password not present' });
+    return;
+  }
+
+  const db = await connectToDatabase(process.env.MONGODB_URI);
+
+  const collection = db.collection('users');
+
+  const checkExist = await collection.findOne({ email });
+
+  if (!checkExist) {
+    res.statusCode = 401;
+    res.json({ status: 'error', message: 'User not found' });
+    return;
+  }
+
+  const checkPassword = await bcrypt.compare(password, checkExist.password);
+
+  if (!checkPassword) {
+    res.statusCode = 401;
+    res.json({ status: 'error', message: 'Password does not match' });
     return;
   }
 
