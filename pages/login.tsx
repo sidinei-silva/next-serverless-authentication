@@ -1,24 +1,26 @@
-import axios from 'axios';
+import { useRouter } from 'next/router';
 import React, { FormEvent } from 'react';
+
+import { login } from '../services/auth';
 
 // import { Container } from './styles';
 
 const Login: React.FC = () => {
+  const router = useRouter();
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [errorMessage, setErrorMessage] = React.useState('');
 
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    axios
-      .post('/api/login', { email, password })
-      .then(response => {
-        alert(
-          `Email: ${response.data.email}\rSenha: ${response.data.password}`
-        );
+    await login(email, password)
+      .then(res => {
+        router.push('/');
       })
-      .catch(err => {
-        alert(err.message);
+      .catch(error => {
+        setErrorMessage(error.response.data.message || error.message);
       });
   };
 
@@ -33,6 +35,17 @@ const Login: React.FC = () => {
       }}
     >
       <h1>Login</h1>
+      {errorMessage && (
+        <p
+          style={{
+            padding: '10px',
+            backgroundColor: '#e74c3c',
+            color: '#fff'
+          }}
+        >
+          {errorMessage}
+        </p>
+      )}
       <form
         onSubmit={onSubmit}
         style={{ border: '1px solid #ccc', padding: '25px 50px' }}
