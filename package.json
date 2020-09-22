@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.20.0",
     "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.2",
     "next": "9.5.3",
     "react": "16.13.1",
